@@ -4,8 +4,10 @@ import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.ContextMenu
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.webkit.WebViewClient
 import kotlinx.android.synthetic.main.activity_main.*
@@ -40,6 +42,9 @@ class MainActivity : AppCompatActivity() {
                 false
             }
         }
+
+        //컨텍스트 메뉴 등록
+        registerForContextMenu(webView)
     }
     
     override fun onBackPressed() {
@@ -82,7 +87,7 @@ class MainActivity : AppCompatActivity() {
             //암시적 인텐트
             R.id.action_call -> {
                 val intent = Intent(Intent.ACTION_DIAL)
-                intent.data - Uri.parse("tel:031-123-4567")
+                intent.data = Uri.parse("tel:031-123-4567")
                 if(intent.resolveActivity(packageManager) != null){
                     startActivity(intent)
                 }
@@ -102,5 +107,30 @@ class MainActivity : AppCompatActivity() {
         //의도한 상황을 제외한 나머지 상황에서는 super 메서드를 호출하는것이 
         //안드로이드 시스템에서의 보편적인 규칙
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onCreateContextMenu(
+        menu: ContextMenu?,
+        v: View?,
+        menuInfo: ContextMenu.ContextMenuInfo?
+    ) {
+        super.onCreateContextMenu(menu, v, menuInfo)
+        //메뉴 리소스를 액티비티의 컨텍스트 메뉴로 사용
+        menuInflater.inflate(R.menu.context, menu)
+    }
+
+    override fun onContextItemSelected(item: MenuItem?): Boolean {
+        when(item?.itemId){
+            R.id.action_share -> {
+                //페이지 공유
+                return true
+            }
+
+            R.id.action_browser -> {
+                //기본 웹 브라우저에서 열기
+                return true
+            }
+        }
+        return super.onContextItemSelected(item)
     }
 }
