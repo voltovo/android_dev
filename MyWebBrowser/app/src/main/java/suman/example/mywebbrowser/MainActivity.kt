@@ -11,6 +11,10 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.webkit.WebViewClient
 import kotlinx.android.synthetic.main.activity_main.*
+import org.jetbrains.anko.browse
+import org.jetbrains.anko.email
+import org.jetbrains.anko.sendSMS
+import org.jetbrains.anko.share
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -86,8 +90,12 @@ class MainActivity : AppCompatActivity() {
             //연락처 클릭하면 전화 앱을 실행
             //암시적 인텐트
             R.id.action_call -> {
+                //인텐트 정의
+                //ACTION_DIAL은 전화 다이얼을 입력해주는 액션
                 val intent = Intent(Intent.ACTION_DIAL)
+                //tel: 로 시작하는 Uri는 전화번호를 나타내는 국제표준 방법
                 intent.data = Uri.parse("tel:031-123-4567")
+                //resolveActivity = 이 인텐트를 수행하는 액티비티가 있는지 검사
                 if(intent.resolveActivity(packageManager) != null){
                     startActivity(intent)
                 }
@@ -96,11 +104,13 @@ class MainActivity : AppCompatActivity() {
             
             R.id.action_send_text -> {
                 //문자 보내기
+                sendSMS("010-4010-3981", webView.url)
                 return true
             }
 
             R.id.action_email -> {
                 //이메일 보내기
+                email("voltovo@naver.com","좋은 사이트", webView.url)
                 return true
             }
         }
@@ -123,11 +133,13 @@ class MainActivity : AppCompatActivity() {
         when(item?.itemId){
             R.id.action_share -> {
                 //페이지 공유
+                share(webView.url)
                 return true
             }
 
             R.id.action_browser -> {
                 //기본 웹 브라우저에서 열기
+                browse(webView.url)
                 return true
             }
         }
