@@ -66,6 +66,8 @@ import android.view.WindowManager
             //로그 표시(디버그용)
             Log.d("MainActivity","onSensorChanged: x :" +
             "${event.values[0]}, y :${event.values[1]}, z :${event.values[2]}")
+
+            tiltView.onSensorEvent(event)
         }
     }
 }
