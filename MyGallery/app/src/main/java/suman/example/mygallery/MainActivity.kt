@@ -5,10 +5,12 @@ import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import org.jetbrains.anko.alert
 import org.jetbrains.anko.noButton
+import org.jetbrains.anko.toast
 import org.jetbrains.anko.yesButton
 
 class MainActivity : AppCompatActivity() {
@@ -57,6 +59,39 @@ class MainActivity : AppCompatActivity() {
         null, //가져올 항목 배열
             null, //조건
             null,//조건
-            MediaStore.Images.ImageColumns.DATE_TAKEN + "DESC") //최신 날짜 정렬
+            MediaStore.Images.ImageColumns.DATE_TAKEN + " DESC") //최신 날짜 정렬, DESC 앞에 띄어쓰기 주의
+
+            //내부적으로 데이터 이동하는 Cursor 객체
+        if(cursor != null){
+            while (cursor.moveToNext()){
+                //사진 경로 uri 가져오기
+                //사진의 경로가 저장된 데이터베이스의 컬럼명은 DATA 상수에 정의되어 있다.
+                //getColumnIndexOrThrow() 해당 컬럼이 몇번째 인덱스인지 알 수 있다
+                val uri = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA))
+                Log.d("MainActivity",uri)
+            }
+            //메모리 누수 방지를 위해서 close()
+            cursor.close()
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when(requestCode){
+            REQUEST_READ_EXTERNAL_STORAGE -> {
+                if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)){
+                    //권한 허용됨
+                    getAllPhotos()
+                }else{
+                    //권한 거부
+                    toast("권한 거부 됨")
+                }
+                return
+            }
+        }
     }
 }
